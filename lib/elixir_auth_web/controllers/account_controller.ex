@@ -6,12 +6,24 @@ defmodule ElixirAuthWeb.AccountController do
   alias ElixirAuth.Users
   alias ElixirAuth.Users.User
   alias ElixirAuthWeb.Auth.Guardian
+  alias ElixirAuthWeb.Auth.ErrorResponse
 
   action_fallback ElixirAuthWeb.FallbackController
 
   def index(conn, _params) do
     accounts = Accounts.list_accounts()
     render(conn, :index, accounts: accounts)
+  end
+
+  def sign_in(conn, %{"email" => email, "password" => password}) do
+    case Guardian.authenticate(email, password) do
+      {:ok, account, token} ->
+        render(conn, :data_with_token, %{account: account, token: token})
+
+      {:error, :unauthorized} ->
+        raise ErrorResponse,
+          message: "Email or password is incorrect"
+    end
   end
 
   def create(conn, %{"account" => account_params}) do
@@ -25,6 +37,7 @@ defmodule ElixirAuthWeb.AccountController do
   end
 
   def show(conn, %{"id" => id}) do
+    dbg("show")
     account = Accounts.get_account!(id)
     render(conn, :show, account: account)
   end

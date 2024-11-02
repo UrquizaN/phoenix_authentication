@@ -5,14 +5,12 @@ defmodule ElixirAuthWeb.Auth.Guardian do
 
   def subject_for_token(%{id: id}, _claims), do: {:ok, to_string(id)}
 
-  def resource_from_claims(%{"sub" => id}, _claims) do
+  def resource_from_claims(%{"sub" => id} = _claims) do
     case Accounts.get_account!(id) do
       nil -> {:error, :resource_not_found}
       resource -> {:ok, resource}
     end
   end
-
-  def resource_from_claims(_, _claims), do: {:error, :invalid_claims}
 
   def authenticate(email, password) do
     case Accounts.get_account_by_email(email) do
