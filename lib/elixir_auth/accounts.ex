@@ -38,6 +38,22 @@ defmodule ElixirAuth.Accounts do
   def get_account!(id), do: Repo.get!(Account, id)
 
   @doc """
+  Gets a single account.
+
+  Raises 'nil' if the Account does not exist.
+
+  ## Examples
+
+      iex> get_account_by_email(email@email.com)
+      %Account{}
+
+      iex> get_account_by_email(notfound@email.com)
+      nil
+
+  """
+  def get_account_by_email(email), do: Repo.get_by(Account, email: email)
+
+  @doc """
   Creates a account.
 
   ## Examples
