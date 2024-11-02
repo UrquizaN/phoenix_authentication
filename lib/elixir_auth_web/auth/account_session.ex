@@ -1,6 +1,6 @@
 defmodule ElixirAuthWeb.Auth.AccountSession do
   import Plug.Conn
-  alias ElixirAuthWeb.Auth.ErrorResponse
+  alias ElixirAuthWeb.Auth.ErrorResponse.Unauthorized
   alias ElixirAuth.Accounts
 
   def init(opts), do: opts
@@ -11,7 +11,7 @@ defmodule ElixirAuthWeb.Auth.AccountSession do
     else
       account_id = get_session(conn, :account_id)
 
-      if is_nil(account_id), do: raise(ErrorResponse)
+      if is_nil(account_id), do: raise(Unauthorized)
 
       account = Accounts.get_account!(account_id)
 

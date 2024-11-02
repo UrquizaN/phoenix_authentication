@@ -6,9 +6,23 @@ defmodule ElixirAuthWeb.AccountController do
   alias ElixirAuth.Users
   alias ElixirAuth.Users.User
   alias ElixirAuthWeb.Auth.Guardian
-  alias ElixirAuthWeb.Auth.ErrorResponse
+  alias ElixirAuthWeb.Auth.ErrorResponse.{Unauthorized, Forbidden}
+
+  plug :authenticated_account when action in [:update, :delete]
 
   action_fallback ElixirAuthWeb.FallbackController
+
+  def authenticated_account(conn, _opts) do
+    %{params: %{"account" => params}} = conn
+
+    account = Accounts.get_account!(params["id"])
+
+    if conn.assigns.current_account.id == account.id do
+      conn
+    else
+      raise Forbidden
+    end
+  end
 
   def index(conn, _params) do
     accounts = Accounts.list_accounts()
@@ -23,7 +37,7 @@ defmodule ElixirAuthWeb.AccountController do
         |> render(:data_with_token, %{account: account, token: token})
 
       {:error, :unauthorized} ->
-        raise ErrorResponse,
+        raise Unauthorized,
           message: "Email or password is incorrect"
     end
   end
@@ -43,8 +57,8 @@ defmodule ElixirAuthWeb.AccountController do
     render(conn, :show, account: account)
   end
 
-  def update(conn, %{"id" => id, "account" => account_params}) do
-    account = Accounts.get_account!(id)
+  def update(conn, %{"account" => account_params}) do
+    account = Accounts.get_account!(account_params["id"])
 
     with {:ok, %Account{} = account} <- Accounts.update_account(account, account_params) do
       render(conn, :show, account: account)
