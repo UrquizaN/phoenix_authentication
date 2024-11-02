@@ -3,6 +3,9 @@ defmodule ElixirAuthWeb.AccountController do
 
   alias ElixirAuth.Accounts
   alias ElixirAuth.Accounts.Account
+  alias ElixirAuth.Users
+  alias ElixirAuth.Users.User
+  alias ElixirAuthWeb.Auth.Guardian
 
   action_fallback ElixirAuthWeb.FallbackController
 
@@ -12,10 +15,12 @@ defmodule ElixirAuthWeb.AccountController do
   end
 
   def create(conn, %{"account" => account_params}) do
-    with {:ok, %Account{} = account} <- Accounts.create_account(account_params) do
+    with {:ok, %Account{} = account} <- Accounts.create_account(account_params),
+         {:ok, token, _claims} <- Guardian.encode_and_sign(account),
+         {:ok, %User{} = _user} <- Users.create_user(account, account_params) do
       conn
       |> put_status(:created)
-      |> render(:show, account: account)
+      |> render(:data_with_token, %{account: account, token: token})
     end
   end
 

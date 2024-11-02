@@ -22,4 +22,12 @@ defmodule ElixirAuthWeb.AccountJSON do
       hashed_password: account.hashed_password
     }
   end
+
+  def data_with_token(%{account: %Account{} = account, token: token}) do
+    %{
+      id: account.id,
+      email: account.email,
+      token: token
+    }
+  end
 end

@@ -9,5 +9,6 @@ defmodule ElixirAuthWeb.Router do
     pipe_through :api
 
     resources "/", DefaultController, only: [:index]
+    post "/accounts/create", AccountController, :create
   end
 end
