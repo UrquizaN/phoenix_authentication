@@ -20,5 +20,5 @@ defmodule ElixirAuthWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :elixir_auth
+  use Gettext.Backend, otp_app: :elixir_auth
 end
