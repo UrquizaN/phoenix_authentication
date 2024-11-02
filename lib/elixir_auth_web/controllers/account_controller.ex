@@ -18,7 +18,9 @@ defmodule ElixirAuthWeb.AccountController do
   def sign_in(conn, %{"email" => email, "password" => password}) do
     case Guardian.authenticate(email, password) do
       {:ok, account, token} ->
-        render(conn, :data_with_token, %{account: account, token: token})
+        conn
+        |> Plug.Conn.put_session(:account_id, account.id)
+        |> render(:data_with_token, %{account: account, token: token})
 
       {:error, :unauthorized} ->
         raise ErrorResponse,
@@ -37,7 +39,6 @@ defmodule ElixirAuthWeb.AccountController do
   end
 
   def show(conn, %{"id" => id}) do
-    dbg("show")
     account = Accounts.get_account!(id)
     render(conn, :show, account: account)
   end
