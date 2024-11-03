@@ -31,5 +31,7 @@ defmodule ElixirAuthWeb.Router do
 
     get "/accounts/:id", AccountController, :show
     post "/accounts/update", AccountController, :update
+    post "/accounts/sign_out", AccountController, :sign_out
+    post "/accounts/refresh_token", AccountController, :refresh_token
   end
 end
